@@ -2,8 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:formvalidation/src/bloc/provider.dart';
 import 'package:formvalidation/src/pages/home_page.dart';
 import 'package:formvalidation/src/pages/login_page.dart';
+import 'package:admob_flutter/admob_flutter.dart';
+
  
-void main() => runApp(MyApp());
+void main() {
+    //esto es necesario para inicializar el bloque de anuncio de admob
+    WidgetsFlutterBinding.ensureInitialized();
+    Admob.initialize();
+
+  runApp(MyApp());
+  //id de mi aplicación com.example.formvalidation
+  }
  
 class MyApp extends StatelessWidget {
   @override
