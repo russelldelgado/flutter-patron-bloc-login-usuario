@@ -12,13 +12,24 @@ class ProductoPage extends StatefulWidget {
 
 class _ProductoPageState extends State<ProductoPage> {
 final formKey = GlobalKey<FormState>();
+final scaffoldKey = GlobalKey<ScaffoldState>();
  final productoProvider = new ProductosProviders();
 
 ProductoModels productoModels = ProductoModels();
+bool _guardando = false;
 
   @override
   Widget build(BuildContext context) {
+
+    final ProductoModels prodData = ModalRoute.of(context).settings.arguments;
+
+    if(prodData != null){
+        productoModels = prodData;
+    }
+
     return Scaffold(
+      key: scaffoldKey,
+
       appBar: AppBar(title: Text("Producto"),
        actions: [
          IconButton(icon: Icon(Icons.photo_size_select_actual), onPressed: () {},),
@@ -109,7 +120,7 @@ Widget  _crearBoton(){
     borderRadius: BorderRadius.circular(20),),
   color: Colors.deepPurple,
   textColor: Colors.white,
-  onPressed: _submit,
+  onPressed: (_guardando ) ?  null :_submit ,
   );
 }
 
@@ -120,13 +131,35 @@ _submit(){
  }
 
   formKey.currentState.save();
- print("todo ok");
- print(productoModels.titulo);
- print(productoModels.valor);
- print(productoModels.disponible);
+  setState(() {
+  _guardando = true;
+    
+  });
 
-productoProvider.crearProducto(productoModels);
+  if(productoModels.id == null){
+    productoProvider.crearProducto(productoModels);
+    mostrarSnackbar("creado correctamente su usuario");
+    }else{
+      productoProvider.editarProducto(productoModels);
+    mostrarSnackbar("actualizado correctamente todo");
+  }
+  
+  Navigator.pop(context);
  
 
 }
+
+//aqui le paso el string del MENSAJE que queiro mostrar para poder reutilizar mi snacbar 
+  void mostrarSnackbar( String mensaje){
+
+//para poder mostrar un snackbar no puedo mostrarlo asi como tal , necesito una referencia al scafold , el scafol es quien puede emitir o mostrar este snacbar
+    final snackbar = SnackBar(
+      content: Text("$mensaje"),
+      duration:Duration(seconds: 2),
+      );
+    
+    scaffoldKey.currentState.showSnackBar(snackbar);
+
+  }
+
 }
