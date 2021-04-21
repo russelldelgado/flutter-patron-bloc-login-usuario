@@ -132,17 +132,18 @@ Widget  _crearBoton(){
   );
 }
 
-_submit(){
+_submit()async{
 
  if(!formKey.currentState.validate()){
    return;
  }
 
   formKey.currentState.save();
-  setState(() {
-  _guardando = true;
-    
-  });
+  setState(() {_guardando = true;});
+
+  if(foto != null){
+    productoModels.fotoUrl = await productoProvider.subirImagen(foto);
+  }
 
   if(productoModels.id == null){
     productoProvider.crearProducto(productoModels);
@@ -174,11 +175,17 @@ _submit(){
     
 
     if(productoModels.fotoUrl != null){
-      return Container();
+      return FadeInImage(
+        placeholder: AssetImage("assets/jar-loading.gif"), 
+        image: NetworkImage(productoModels.fotoUrl),
+        width: double.infinity,
+        height: 300.0,
+        fit: BoxFit.cover,
+        );
     }else{
 
       return Image(
-        image: AssetImage( foto?.path ??"assets/no-image.png"),
+        image: (foto == null) ? AssetImage("assets/no-image.png") : FileImage(foto),
         width: double.infinity,
         height: 300.0,
         fit: BoxFit.cover,
@@ -189,11 +196,21 @@ _submit(){
 
 
   _seleccionarFoto() async {
-    final _picker =  ImagePicker();
-    final _pickerFile = await _picker.getImage(
-      source: ImageSource.gallery);
+    _procesarImagen(ImageSource.gallery);    
+  }
+  _tomarFoto()async{
+    _procesarImagen(ImageSource.camera);    
+  }
 
-      foto = File(_pickerFile.path);
+  _procesarImagen(ImageSource origen)async{
+  
+    final _picker =  ImagePicker();
+    final _pickerFile = await _picker.getImage(source: origen);
+   print(_pickerFile);
+   if(_pickerFile != null){
+      foto = File(_pickerFile.path);    
+   }
+      
 
       if(foto !=null){
         //aqui hacemos una limpieza para que se pueda cambiar la foto si anteriormente habia otra.
@@ -204,9 +221,6 @@ _submit(){
         
       });
 
-  }
-  _tomarFoto(){
-
-  }
+  } 
 
 }
