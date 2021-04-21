@@ -1,7 +1,12 @@
+
 import 'package:flutter/material.dart';
 import 'package:formvalidation/src/models/producto_models.dart';
 import 'package:formvalidation/src/providers/productos_providers.dart';
 import 'package:formvalidation/src/utils/utils.dart' as utils;
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+
+
 
 class ProductoPage extends StatefulWidget {
 
@@ -18,6 +23,8 @@ final scaffoldKey = GlobalKey<ScaffoldState>();
 ProductoModels productoModels = ProductoModels();
 bool _guardando = false;
 
+File foto;
+
   @override
   Widget build(BuildContext context) {
 
@@ -32,8 +39,8 @@ bool _guardando = false;
 
       appBar: AppBar(title: Text("Producto"),
        actions: [
-         IconButton(icon: Icon(Icons.photo_size_select_actual), onPressed: () {},),
-         IconButton(icon: Icon(Icons.camera_alt), onPressed: () {},)
+         IconButton(icon: Icon(Icons.photo_size_select_actual), onPressed: _seleccionarFoto,),
+         IconButton(icon: Icon(Icons.camera_alt), onPressed:_tomarFoto,)
 
        ],
       ),
@@ -44,6 +51,7 @@ bool _guardando = false;
             key:formKey ,
             child: Column(
               children: [
+                _mostrarFoto(),
                 _crearNombre(),
                 _crearPrecio(),
                 _crearDisponible(),
@@ -159,6 +167,45 @@ _submit(){
       );
     
     scaffoldKey.currentState.showSnackBar(snackbar);
+
+  }
+
+  _mostrarFoto(){
+    
+
+    if(productoModels.fotoUrl != null){
+      return Container();
+    }else{
+
+      return Image(
+        image: AssetImage( foto?.path ??"assets/no-image.png"),
+        width: double.infinity,
+        height: 300.0,
+        fit: BoxFit.cover,
+      );
+
+    }
+  }
+
+
+  _seleccionarFoto() async {
+    final _picker =  ImagePicker();
+    final _pickerFile = await _picker.getImage(
+      source: ImageSource.gallery);
+
+      foto = File(_pickerFile.path);
+
+      if(foto !=null){
+        //aqui hacemos una limpieza para que se pueda cambiar la foto si anteriormente habia otra.
+        productoModels.fotoUrl = null;
+      }
+
+      setState(() {
+        
+      });
+
+  }
+  _tomarFoto(){
 
   }
 
